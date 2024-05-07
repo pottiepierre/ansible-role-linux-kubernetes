@@ -37,3 +37,6 @@
         state: started
         enabled: yes
   when: ansible_os_family == 'RedHat'
+
+- shell: kubeadm config images pull
+  
