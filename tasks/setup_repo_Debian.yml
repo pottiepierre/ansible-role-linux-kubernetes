@@ -11,16 +11,15 @@
     update_cache: yes 
     force_apt_get: yes
 
-- name: Add Google GPG apt Key
-  ansible.builtin.apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
+- name: Get Kubernetes package key
+  shell: curl -fsSL {{ k8s_url_apt_key }} | gpg --dearmor -o {{ k8s_gpgpath }}
+  args:
+    creates: "{{ k8s_gpgpath }}"
 
-- name: Add K8s Repository
-  ansible.builtin.apt_repository:
-    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
-    state: present
-  ignore_errors: "{{ ansible_check_mode }}"
+- name: Install Kubernetes repository
+  apt_repository:
+    filename: kubernetes
+    repo: "deb [signed-by={{ k8s_gpgpath }}] {{ k8s_repository }} /"
 
 - name: Add Docker GPG apt Key
   ansible.builtin.apt_key:
